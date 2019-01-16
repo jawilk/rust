@@ -1168,7 +1168,9 @@ impl Build {
     /// Copies a file from `src` to `dst`
     pub fn copy(&self, src: &Path, dst: &Path) {
         if self.config.dry_run { return; }
-        self.verbose(&format!("copying {:?} => {:?}", src, dst));
+        if dst.display().to_string().contains("rust-std") {
+            self.verbose(&format!("copying {:?} => {:?}", src, dst));
+        }
         let _ = fs::remove_file(&dst);
         let metadata = t!(src.symlink_metadata());
         if metadata.file_type().is_symlink() {
