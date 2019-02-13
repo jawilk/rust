@@ -93,6 +93,10 @@ fn main() {
         optional_components.push("riscv");
     }
 
+    if major > 6 {
+        optional_components.push("bpf");
+    }
+
     // FIXME: surely we don't need all these components, right? Stuff like mcjit
     //        or interpreter the compiler itself never uses.
     let required_components = &["ipo",
