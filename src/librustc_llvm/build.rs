@@ -102,6 +102,7 @@ fn main() {
 
     if major > 6 {
         optional_components.push("riscv");
+        optional_components.push("bpf");
     }
 
     let required_components =
