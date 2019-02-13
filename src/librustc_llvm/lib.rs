@@ -108,4 +108,10 @@ pub fn initialize_available_targets() {
                  LLVMInitializeWebAssemblyTarget,
                  LLVMInitializeWebAssemblyTargetMC,
                  LLVMInitializeWebAssemblyAsmPrinter);
+    init_target!(llvm_component = "bpf",
+                 LLVMInitializeBPFTargetInfo,
+                 LLVMInitializeBPFTarget,
+                 LLVMInitializeBPFTargetMC,
+                 LLVMInitializeBPFAsmPrinter,
+                 LLVMInitializeBPFAsmParser);
 }
