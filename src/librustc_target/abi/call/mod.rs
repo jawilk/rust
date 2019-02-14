@@ -23,6 +23,7 @@ mod wasm32_bindgen_compat;
 mod x86;
 mod x86_64;
 mod x86_win64;
+mod bpf;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum PassMode {
@@ -600,6 +601,7 @@ impl<'a, Ty> FnAbi<'a, Ty> {
                 wasm32_bindgen_compat::compute_abi_info(self)
             }
             "wasm32" | "asmjs" => wasm32::compute_abi_info(cx, self),
+            "bpf" => bpf::compute_abi_info(self),
             a => return Err(format!("unrecognized arch \"{}\" in target specification", a)),
         }
 
