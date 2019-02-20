@@ -45,7 +45,7 @@
 	url = https://github.com/rust-embedded/book.git
 [submodule "src/llvm-project"]
 	path = src/llvm-project
-	url = git@github.com:solana-labs/llvm-project.git
+	url = https://github.com/solana-labs/llvm-project.git
 	branch = rustc/8.0-2019-01-16
 [submodule "src/doc/embedded-book"]
 	path = src/doc/embedded-book
