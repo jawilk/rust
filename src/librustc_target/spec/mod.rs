@@ -677,6 +677,8 @@ supported_targets! {
     ("powerpc64-wrs-vxworks", powerpc64_wrs_vxworks),
 
     ("mipsel-sony-psp", mipsel_sony_psp),
+
+    ("bpfel-unknown-unknown", bpfel_unknown_unknown),
 }
 
 /// Everything `rustc` knows about how to compile for a specific target.
