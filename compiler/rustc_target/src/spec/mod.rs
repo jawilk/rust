@@ -941,6 +941,7 @@ supported_targets! {
 
     ("bpfeb-unknown-none", bpfeb_unknown_none),
     ("bpfel-unknown-none", bpfel_unknown_none),
+    ("bpfel-unknown-unknown", bpfel_unknown_unknown),
 }
 
 /// Warnings encountered when parsing the target `json`.
