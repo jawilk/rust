@@ -504,6 +504,8 @@ supported_targets! {
     ("powerpc-wrs-vxworks", powerpc_wrs_vxworks),
     ("powerpc-wrs-vxworks-spe", powerpc_wrs_vxworks_spe),
     ("powerpc64-wrs-vxworks", powerpc64_wrs_vxworks),
+    
+    ("bpfel-unknown-unknown", bpfel_unknown_unknown),
 }
 
 /// Everything `rustc` knows about how to compile for a specific target.

@@ -122,6 +122,7 @@ ENV TARGETS=$TARGETS,armebv7r-none-eabihf
 ENV TARGETS=$TARGETS,armv7r-none-eabi
 ENV TARGETS=$TARGETS,armv7r-none-eabihf
 ENV TARGETS=$TARGETS,thumbv7neon-unknown-linux-gnueabihf
+ENV TARGETS=$TARGETS,bpfel-unknown-unknown
 
 ENV CC_mipsel_unknown_linux_musl=mipsel-openwrt-linux-gcc \
     CC_mips_unknown_linux_musl=mips-openwrt-linux-gcc \
