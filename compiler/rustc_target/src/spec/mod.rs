@@ -662,6 +662,8 @@ supported_targets! {
     ("mipsel-sony-psp", mipsel_sony_psp),
     ("mipsel-unknown-none", mipsel_unknown_none),
     ("thumbv4t-none-eabi", thumbv4t_none_eabi),
+
+    ("bpfel-unknown-unknown", bpfel_unknown_unknown),
 }
 
 /// Everything `rustc` knows about how to compile for a specific target.
