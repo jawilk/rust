@@ -1818,6 +1818,12 @@ pub fn rustc_optgroups() -> Vec<RustcOptGroup> {
             "How errors and other messages are produced",
             "human|json|short",
         ),
+        opt::multi_s(
+            "",
+            "json",
+            "Configure the JSON output of the compiler",
+            "CONFIG",
+        ),
         opt::opt(
             "",
             "json-rendered",
