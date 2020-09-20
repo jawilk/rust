@@ -8,6 +8,6 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
 fi
 
 if [ "$1" == "--llvm" ]; then
-    rm -f build/x86_64-apple-darwin/llvm/llvm-finished-building;
+    find ./build -name "llvm-finished-building" -exec rm -r {} \;
 fi
 ./x.py build --stage 1
