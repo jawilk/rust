@@ -199,8 +199,13 @@ impl Step for Llvm {
         // which saves both memory during parallel links and overall disk space
         // for the tools. We don't do this on every platform as it doesn't work
         // equally well everywhere.
-        if builder.llvm_link_tools_dynamically(target) {
+        if builder.config.llvm_link_shared && builder.llvm_link_tools_dynamically(target) {
             cfg.define("LLVM_LINK_LLVM_DYLIB", "ON");
+        } else {
+            cfg.define("LIBCLANG_BUILD_STATIC", "ON");
+            cfg.define("CLANG_LINK_CLANG_DYLIB", "OFF");
+            cfg.define("LLVM_BUILD_LLVM_DYLIB", "OFF");
+            cfg.define("LLVM_LINK_LLVM_DYLIB", "OFF");
         }
 
         // For distribution we want the LLVM tools to be *statically* linked to libstdc++
