@@ -359,6 +359,7 @@ extern crate libc;
 // We always need an unwinder currently for backtraces
 #[doc(masked)]
 #[allow(unused_extern_crates)]
+#[cfg(not(target_arch = "bpf"))]
 extern crate unwind;
 
 #[doc(masked)]
@@ -491,6 +492,7 @@ pub mod f64;
 #[macro_use]
 pub mod thread;
 pub mod ascii;
+#[cfg(not(target_arch = "bpf"))]
 pub mod backtrace;
 pub mod collections;
 pub mod env;
@@ -575,6 +577,7 @@ pub mod alloc;
 // Private support modules
 mod panicking;
 
+#[cfg(not(target_arch = "bpf"))]
 #[path = "../../backtrace/src/lib.rs"]
 #[allow(dead_code, unused_attributes)]
 mod backtrace_rs;
