@@ -299,7 +299,7 @@
 #![feature(or_patterns)]
 #![feature(panic_info_message)]
 #![feature(panic_internals)]
-#![feature(panic_unwind)]
+#![cfg_attr(not(target_arch = "bpf"), feature(panic_unwind))]
 #![feature(pin_static_ref)]
 #![feature(prelude_2021)]
 #![feature(prelude_import)]
@@ -355,6 +355,7 @@ extern crate libc;
 // We always need an unwinder currently for backtraces
 #[doc(masked)]
 #[allow(unused_extern_crates)]
+#[cfg(not(target_arch = "bpf"))]
 extern crate unwind;
 
 // During testing, this crate is not actually the "real" std library, but rather
@@ -486,6 +487,7 @@ pub mod f64;
 #[macro_use]
 pub mod thread;
 pub mod ascii;
+#[cfg(not(target_arch = "bpf"))]
 pub mod backtrace;
 pub mod collections;
 pub mod env;
@@ -533,6 +535,7 @@ mod panicking;
 // compiler
 pub mod rt;
 
+#[cfg(not(target_arch = "bpf"))]
 #[path = "../../backtrace/src/lib.rs"]
 #[allow(dead_code, unused_attributes)]
 mod backtrace_rs;
@@ -547,11 +550,13 @@ mod backtrace_rs;
 #[allow(missing_debug_implementations, missing_docs, dead_code)]
 #[unstable(feature = "stdsimd", issue = "48556")]
 #[cfg(not(test))]
+#[cfg(not(target_arch = "bpf"))]
 mod std_detect;
 
 #[doc(hidden)]
 #[unstable(feature = "stdsimd", issue = "48556")]
 #[cfg(not(test))]
+#[cfg(not(target_arch = "bpf"))]
 pub use std_detect::detect;
 
 // Re-export macros defined in libcore.
