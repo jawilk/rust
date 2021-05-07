@@ -6,24 +6,25 @@ mod tests;
 use crate::io::prelude::*;
 
 #[cfg(not(target_arch = "bpf"))]
-use crate::cell::Cell;
-use crate::cell::RefCell;
+use crate::cell::{Cell, RefCell};
 use crate::fmt;
+#[cfg(not(target_arch = "bpf"))]
 use crate::io::{self, BufReader, Initializer, IoSlice, IoSliceMut, LineWriter};
+#[cfg(target_arch = "bpf")]
+use crate::io::{self, BufReader, Initializer, IoSlice, IoSliceMut};
 #[cfg(not(target_arch = "bpf"))]
 use crate::lazy::SyncOnceCell;
+#[cfg(not(target_arch = "bpf"))]
 use crate::pin::Pin;
 #[cfg(not(target_arch = "bpf"))]
 use crate::sync::atomic::{AtomicBool, Ordering};
-#[cfg(not(target_arch = "bpf"))]
-use crate::sync::Arc;
-use crate::sync::{Mutex, MutexGuard};
+use crate::sync::{Arc, Mutex, MutexGuard};
 use crate::sys::stdio;
 #[cfg(not(target_arch = "bpf"))]
 use crate::sys_common;
+#[cfg(not(target_arch = "bpf"))]
 use crate::sys_common::remutex::{ReentrantMutex, ReentrantMutexGuard};
 
-#[cfg(not(target_arch = "bpf"))]
 type LocalStream = Arc<Mutex<Vec<u8>>>;
 
 #[cfg(not(target_arch = "bpf"))]
@@ -241,6 +242,7 @@ fn handle_ebadf<T>(r: io::Result<T>, default: T) -> io::Result<T> {
 /// ```
 #[stable(feature = "rust1", since = "1.0.0")]
 pub struct Stdin {
+    #[cfg(not(target_arch = "bpf"))]
     inner: &'static Mutex<BufReader<StdinRaw>>,
 }
 
@@ -325,6 +327,13 @@ pub fn stdin() -> Stdin {
     }
 }
 
+/// BPF dummy
+#[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(target_arch = "bpf")]
+pub fn stdin() -> Stdin {
+    Stdin {}
+}
+
 impl Stdin {
     /// Locks this handle to the standard input stream, returning a readable
     /// guard.
@@ -348,6 +357,7 @@ impl Stdin {
     /// }
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
+    #[cfg(not(target_arch = "bpf"))]
     pub fn lock(&self) -> StdinLock<'_> {
         StdinLock { inner: self.inner.lock().unwrap_or_else(|e| e.into_inner()) }
     }
@@ -379,6 +389,7 @@ impl Stdin {
     ///   in which case it will wait for the Enter key to be pressed before
     ///   continuing
     #[stable(feature = "rust1", since = "1.0.0")]
+    #[cfg(not(target_arch = "bpf"))]
     pub fn read_line(&self, buf: &mut String) -> io::Result<usize> {
         self.lock().read_line(buf)
     }
@@ -392,6 +403,7 @@ impl fmt::Debug for Stdin {
 }
 
 #[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(not(target_arch = "bpf"))]
 impl Read for Stdin {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         self.lock().read(buf)
@@ -415,6 +427,34 @@ impl Read for Stdin {
     }
     fn read_exact(&mut self, buf: &mut [u8]) -> io::Result<()> {
         self.lock().read_exact(buf)
+    }
+}
+
+#[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(target_arch = "bpf")]
+impl Read for Stdin {
+    fn read(&mut self, _buf: &mut [u8]) -> io::Result<usize> {
+        Ok(0)
+    }
+    fn read_vectored(&mut self, _bufs: &mut [IoSliceMut<'_>]) -> io::Result<usize> {
+        Ok(0)
+    }
+    #[inline]
+    fn is_read_vectored(&self) -> bool {
+        false
+    }
+    #[inline]
+    unsafe fn initializer(&self) -> Initializer {
+        Initializer::nop()
+    }
+    fn read_to_end(&mut self, _buf: &mut Vec<u8>) -> io::Result<usize> {
+        Ok(0)
+    }
+    fn read_to_string(&mut self, _buf: &mut String) -> io::Result<usize> {
+        Ok(0)
+    }
+    fn read_exact(&mut self, _buf: &mut [u8]) -> io::Result<()> {
+        Ok(())
     }
 }
 
@@ -505,6 +545,7 @@ pub struct Stdout {
     // FIXME: this should be LineWriter or BufWriter depending on the state of
     //        stdout (tty or not). Note that if this is not line buffered it
     //        should also flush-on-panic or some form of flush-on-abort.
+    #[cfg(not(target_arch = "bpf"))]
     inner: Pin<&'static ReentrantMutex<RefCell<LineWriter<StdoutRaw>>>>,
 }
 
@@ -518,8 +559,15 @@ pub struct Stdout {
 /// non-UTF-8 byte sequences. Attempting to write bytes that are not valid UTF-8 will return
 /// an error.
 #[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(not(target_arch = "bpf"))]
 pub struct StdoutLock<'a> {
     inner: ReentrantMutexGuard<'a, RefCell<LineWriter<StdoutRaw>>>,
+}
+
+/// BPF dummy
+#[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(target_arch = "bpf")]
+pub struct StdoutLock {
 }
 
 /// Constructs a new handle to the standard output of the current process.
@@ -592,6 +640,13 @@ pub fn stdout() -> Stdout {
     }
 }
 
+/// Dummy stdout for BPF target
+#[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(target_arch = "bpf")]
+pub fn stdout() -> Stdout {
+    Stdout {}
+}
+
 impl Stdout {
     /// Locks this handle to the standard output stream, returning a writable
     /// guard.
@@ -614,8 +669,11 @@ impl Stdout {
     /// }
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
+    #[cfg(not(target_arch = "bpf"))]
     pub fn lock(&self) -> StdoutLock<'_> {
-        StdoutLock { inner: self.inner.lock() }
+        StdoutLock {
+            inner: self.inner.lock()
+        }
     }
 }
 
@@ -627,6 +685,7 @@ impl fmt::Debug for Stdout {
 }
 
 #[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(not(target_arch = "bpf"))]
 impl Write for Stdout {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         (&*self).write(buf)
@@ -652,7 +711,41 @@ impl Write for Stdout {
     }
 }
 
+#[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(target_arch = "bpf")]
+impl Write for Stdout {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        unsafe {
+            crate::sys::sol_log(core::str::from_utf8_unchecked(buf));
+        }
+        Ok(buf.len())
+    }
+    fn write_vectored(&mut self, _bufs: &[IoSlice<'_>]) -> io::Result<usize> {
+        Ok(0)
+    }
+    #[inline]
+    fn is_write_vectored(&self) -> bool {
+        false
+    }
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+    fn write_all(&mut self, buf: &[u8]) -> io::Result<()> {
+        unsafe {
+            crate::sys::sol_log(core::str::from_utf8_unchecked(buf));
+        }
+        Ok(())
+    }
+    fn write_all_vectored(&mut self, _bufs: &mut [IoSlice<'_>]) -> io::Result<()> {
+        Ok(())
+    }
+    fn write_fmt(&mut self, _args: fmt::Arguments<'_>) -> io::Result<()> {
+        Ok(())
+    }
+}
+
 #[stable(feature = "write_mt", since = "1.48.0")]
+#[cfg(not(target_arch = "bpf"))]
 impl Write for &Stdout {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         self.lock().write(buf)
@@ -679,6 +772,7 @@ impl Write for &Stdout {
 }
 
 #[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(not(target_arch = "bpf"))]
 impl Write for StdoutLock<'_> {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         self.inner.borrow_mut().write(buf)
@@ -702,7 +796,16 @@ impl Write for StdoutLock<'_> {
 }
 
 #[stable(feature = "std_debug", since = "1.16.0")]
+#[cfg(not(target_arch = "bpf"))]
 impl fmt::Debug for StdoutLock<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.pad("StdoutLock { .. }")
+    }
+}
+
+#[stable(feature = "std_debug", since = "1.16.0")]
+#[cfg(target_arch = "bpf")]
+impl fmt::Debug for StdoutLock {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.pad("StdoutLock { .. }")
     }
@@ -720,6 +823,7 @@ impl fmt::Debug for StdoutLock<'_> {
 /// an error.
 #[stable(feature = "rust1", since = "1.0.0")]
 pub struct Stderr {
+    #[cfg(not(target_arch = "bpf"))]
     inner: Pin<&'static ReentrantMutex<RefCell<StderrRaw>>>,
 }
 
@@ -733,8 +837,15 @@ pub struct Stderr {
 /// non-UTF-8 byte sequences. Attempting to write bytes that are not valid UTF-8 will return
 /// an error.
 #[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(not(target_arch = "bpf"))]
 pub struct StderrLock<'a> {
     inner: ReentrantMutexGuard<'a, RefCell<StderrRaw>>,
+}
+
+/// BPF dummy
+#[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(target_arch = "bpf")]
+pub struct StderrLock {
 }
 
 /// Constructs a new handle to the standard error of the current process.
@@ -790,6 +901,13 @@ pub fn stderr() -> Stderr {
     }
 }
 
+/// BPF dummy
+#[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(target_arch = "bpf")]
+pub fn stderr() -> Stderr {
+    Stderr {}
+}
+
 impl Stderr {
     /// Locks this handle to the standard error stream, returning a writable
     /// guard.
@@ -812,6 +930,7 @@ impl Stderr {
     /// }
     /// ```
     #[stable(feature = "rust1", since = "1.0.0")]
+    #[cfg(not(target_arch = "bpf"))]
     pub fn lock(&self) -> StderrLock<'_> {
         StderrLock { inner: self.inner.lock() }
     }
@@ -825,6 +944,7 @@ impl fmt::Debug for Stderr {
 }
 
 #[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(not(target_arch = "bpf"))]
 impl Write for Stderr {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         (&*self).write(buf)
@@ -850,7 +970,41 @@ impl Write for Stderr {
     }
 }
 
+#[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(target_arch = "bpf")]
+impl Write for Stderr {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        unsafe {
+            crate::sys::sol_log(core::str::from_utf8_unchecked(buf));
+        }
+        Ok(buf.len())
+    }
+    fn write_vectored(&mut self, _bufs: &[IoSlice<'_>]) -> io::Result<usize> {
+        Ok(0)
+    }
+    #[inline]
+    fn is_write_vectored(&self) -> bool {
+        false
+    }
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+    fn write_all(&mut self, buf: &[u8]) -> io::Result<()> {
+        unsafe {
+            crate::sys::sol_log(core::str::from_utf8_unchecked(buf));
+        }
+        Ok(())
+    }
+    fn write_all_vectored(&mut self, _bufs: &mut [IoSlice<'_>]) -> io::Result<()> {
+        Ok(())
+    }
+    fn write_fmt(&mut self, _args: fmt::Arguments<'_>) -> io::Result<()> {
+        Ok(())
+    }
+}
+
 #[stable(feature = "write_mt", since = "1.48.0")]
+#[cfg(not(target_arch = "bpf"))]
 impl Write for &Stderr {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         self.lock().write(buf)
@@ -877,6 +1031,7 @@ impl Write for &Stderr {
 }
 
 #[stable(feature = "rust1", since = "1.0.0")]
+#[cfg(not(target_arch = "bpf"))]
 impl Write for StderrLock<'_> {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         self.inner.borrow_mut().write(buf)
@@ -900,13 +1055,23 @@ impl Write for StderrLock<'_> {
 }
 
 #[stable(feature = "std_debug", since = "1.16.0")]
+#[cfg(not(target_arch = "bpf"))]
 impl fmt::Debug for StderrLock<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.pad("StderrLock { .. }")
     }
 }
 
+#[stable(feature = "std_debug", since = "1.16.0")]
+#[cfg(target_arch = "bpf")]
+impl fmt::Debug for StderrLock {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.pad("StderrLock { .. }")
+    }
+}
+
 /// Sets the thread-local output capture buffer and returns the old one.
+#[cfg(not(target_arch = "bpf"))]
 #[unstable(
     feature = "internal_output_capture",
     reason = "this function is meant for use in the test crate \
@@ -914,7 +1079,6 @@ impl fmt::Debug for StderrLock<'_> {
     issue = "none"
 )]
 #[doc(hidden)]
-#[cfg(not(target_arch = "bpf"))]
 pub fn set_output_capture(sink: Option<LocalStream>) -> Option<LocalStream> {
     if sink.is_none() && !OUTPUT_CAPTURE_USED.load(Ordering::Relaxed) {
         // OUTPUT_CAPTURE is definitely None since OUTPUT_CAPTURE_USED is false.
@@ -922,6 +1086,19 @@ pub fn set_output_capture(sink: Option<LocalStream>) -> Option<LocalStream> {
     }
     OUTPUT_CAPTURE_USED.store(true, Ordering::Relaxed);
     OUTPUT_CAPTURE.with(move |slot| slot.replace(sink))
+}
+
+/// Dummy version for satisfying test library dependencies when building the BPF target.
+#[cfg(target_arch = "bpf")]
+#[unstable(
+    feature = "internal_output_capture",
+    reason = "this function is meant for use in the test crate \
+        and may disappear in the future",
+    issue = "none"
+)]
+#[doc(hidden)]
+pub fn set_output_capture(_sink: Option<LocalStream>) -> Option<LocalStream> {
+    None
 }
 
 /// Write `args` to the capture buffer if enabled and possible, or `global_s`
