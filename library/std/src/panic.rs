@@ -31,7 +31,6 @@ pub macro panic_2015 {
 pub use core::panic::panic_2021;
 
 #[stable(feature = "panic_hooks", since = "1.10.0")]
-#[cfg(not(target_arch = "bpf"))]
 pub use crate::panicking::{set_hook, take_hook};
 
 #[stable(feature = "panic_hooks", since = "1.10.0")]
@@ -128,7 +127,6 @@ where
 /// assert!(result.is_err());
 /// ```
 #[stable(feature = "catch_unwind", since = "1.9.0")]
-#[cfg(not(target_arch = "bpf"))]
 pub fn catch_unwind<F: FnOnce() -> R + UnwindSafe, R>(f: F) -> Result<R> {
     unsafe { panicking::r#try(f) }
 }
