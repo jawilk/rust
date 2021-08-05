@@ -6,8 +6,10 @@ use crate::sys::locks as imp;
 ///
 /// This rwlock has a const constructor ([`StaticRwLock::new`]), does not
 /// implement `Drop` to cleanup resources.
+#[cfg(not(target_arch = "bpf"))]
 pub struct StaticRwLock(imp::RwLock);
 
+#[cfg(not(target_arch = "bpf"))]
 impl StaticRwLock {
     /// Creates a new rwlock for use.
     pub const fn new() -> Self {
@@ -35,9 +37,11 @@ impl StaticRwLock {
     }
 }
 
+#[cfg(not(target_arch = "bpf"))]
 #[must_use]
 pub struct StaticRwLockReadGuard(&'static imp::RwLock);
 
+#[cfg(not(target_arch = "bpf"))]
 impl Drop for StaticRwLockReadGuard {
     #[inline]
     fn drop(&mut self) {
@@ -47,9 +51,11 @@ impl Drop for StaticRwLockReadGuard {
     }
 }
 
+#[cfg(not(target_arch = "bpf"))]
 #[must_use]
 pub struct StaticRwLockWriteGuard(&'static imp::RwLock);
 
+#[cfg(not(target_arch = "bpf"))]
 impl Drop for StaticRwLockWriteGuard {
     #[inline]
     fn drop(&mut self) {
