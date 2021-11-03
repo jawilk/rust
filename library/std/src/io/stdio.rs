@@ -437,6 +437,7 @@ impl Stdin {
 
     // Locks this handle with any lifetime. This depends on the
     // implementation detail that the underlying `Mutex` is static.
+    #[cfg(not(target_arch = "bpf"))]
     fn lock_any<'a>(&self) -> StdinLock<'a> {
         StdinLock { inner: self.inner.lock().unwrap_or_else(|e| e.into_inner()) }
     }
@@ -468,6 +469,7 @@ impl Stdin {
     /// }
     /// ```
     #[unstable(feature = "stdio_locked", issue = "86845")]
+    #[cfg(not(target_arch = "bpf"))]
     pub fn into_locked(self) -> StdinLock<'static> {
         self.lock_any()
     }
@@ -489,6 +491,7 @@ impl Stdin {
     /// }
     /// ```
     #[unstable(feature = "stdin_forwarders", issue = "87096")]
+    #[cfg(not(target_arch = "bpf"))]
     pub fn lines(self) -> Lines<StdinLock<'static>> {
         self.into_locked().lines()
     }
@@ -511,6 +514,7 @@ impl Stdin {
     /// }
     /// ```
     #[unstable(feature = "stdin_forwarders", issue = "87096")]
+    #[cfg(not(target_arch = "bpf"))]
     pub fn split(self, byte: u8) -> Split<StdinLock<'static>> {
         self.into_locked().split(byte)
     }
@@ -833,6 +837,7 @@ impl Stdout {
     // Locks this handle with any lifetime. This depends on the
     // implementation detail that the underlying `ReentrantMutex` is
     // static.
+    #[cfg(not(target_arch = "bpf"))]
     fn lock_any<'a>(&self) -> StdoutLock<'a> {
         StdoutLock { inner: self.inner.lock() }
     }
@@ -863,6 +868,7 @@ impl Stdout {
     /// }
     /// ```
     #[unstable(feature = "stdio_locked", issue = "86845")]
+    #[cfg(not(target_arch = "bpf"))]
     pub fn into_locked(self) -> StdoutLock<'static> {
         self.lock_any()
     }
@@ -1159,6 +1165,7 @@ impl Stderr {
     // Locks this handle with any lifetime. This depends on the
     // implementation detail that the underlying `ReentrantMutex` is
     // static.
+    #[cfg(not(target_arch = "bpf"))]
     fn lock_any<'a>(&self) -> StderrLock<'a> {
         StderrLock { inner: self.inner.lock() }
     }
@@ -1186,6 +1193,7 @@ impl Stderr {
     /// }
     /// ```
     #[unstable(feature = "stdio_locked", issue = "86845")]
+    #[cfg(not(target_arch = "bpf"))]
     pub fn into_locked(self) -> StderrLock<'static> {
         self.lock_any()
     }
