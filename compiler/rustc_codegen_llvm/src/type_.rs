@@ -48,10 +48,6 @@ impl<'ll> CodegenCx<'ll, '_> {
         unsafe { llvm::LLVMStructSetBody(ty, els.as_ptr(), els.len() as c_uint, packed as Bool) }
     }
 
-    crate fn type_void(&self) -> &'ll Type {
-        unsafe { llvm::LLVMVoidTypeInContext(self.llcx) }
-    }
-
     crate fn type_metadata(&self) -> &'ll Type {
         unsafe { llvm::LLVMRustMetadataTypeInContext(self.llcx) }
     }
@@ -168,6 +164,10 @@ impl<'ll, 'tcx> BaseTypeMethods<'tcx> for CodegenCx<'ll, 'tcx> {
 
     fn type_f64(&self) -> &'ll Type {
         unsafe { llvm::LLVMDoubleTypeInContext(self.llcx) }
+    }
+
+    fn type_void(&self) -> &'ll Type {
+        unsafe { llvm::LLVMVoidTypeInContext(self.llcx) }
     }
 
     fn type_func(&self, args: &[&'ll Type], ret: &'ll Type) -> &'ll Type {
