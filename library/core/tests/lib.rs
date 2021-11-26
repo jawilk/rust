@@ -98,12 +98,14 @@
 #![feature(slice_flatten)]
 #![deny(unsafe_op_in_unsafe_fn)]
 
+#[cfg(not(target_arch = "bpf"))]
 extern crate test;
 
 mod alloc;
 mod any;
 mod array;
 mod ascii;
+#[cfg(not(target_arch = "bpf"))]
 mod atomic;
 mod bool;
 mod cell;
@@ -112,25 +114,31 @@ mod clone;
 mod cmp;
 mod const_ptr;
 mod convert;
+#[cfg(not(target_arch = "bpf"))]
 mod fmt;
 mod future;
+#[cfg(not(target_arch = "bpf"))]
 mod hash;
 mod intrinsics;
 mod iter;
+#[cfg(not(target_arch = "bpf"))]
 mod lazy;
 mod macros;
 mod manually_drop;
 mod mem;
 mod nonzero;
+#[cfg(not(target_arch = "bpf"))]
 mod num;
 mod ops;
 mod option;
 mod pattern;
 mod pin;
 mod pin_macro;
+#[cfg(not(target_arch = "bpf"))]
 mod ptr;
 mod result;
 mod simd;
+#[cfg(not(target_arch = "bpf"))]
 mod slice;
 mod str;
 mod str_lossy;
