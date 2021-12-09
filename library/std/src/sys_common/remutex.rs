@@ -81,7 +81,7 @@ impl<T> ReentrantMutex<T> {
     /// This function is unsafe because it is required that `init` is called
     /// once this mutex is in its final resting place, and only then are the
     /// lock/unlock methods safe.
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     pub const unsafe fn new(t: T) -> ReentrantMutex<T> {
         ReentrantMutex {
             mutex: sys::Mutex::new(),
@@ -98,7 +98,7 @@ impl<T> ReentrantMutex<T> {
     ///
     /// Unsafe to call more than once, and must be called after this will no
     /// longer move in memory.
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     pub unsafe fn init(self: Pin<&mut Self>) {
         self.get_unchecked_mut().mutex.init()
     }
@@ -115,7 +115,7 @@ impl<T> ReentrantMutex<T> {
     /// If another user of this mutex panicked while holding the mutex, then
     /// this call will return failure if the mutex would otherwise be
     /// acquired.
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     pub fn lock(self: Pin<&Self>) -> ReentrantMutexGuard<'_, T> {
         let this_thread = current_thread_unique_ptr();
         // Safety: We only touch lock_count when we own the lock,
@@ -145,7 +145,7 @@ impl<T> ReentrantMutex<T> {
     /// If another user of this mutex panicked while holding the mutex, then
     /// this call will return failure if the mutex would otherwise be
     /// acquired.
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     pub fn try_lock(self: Pin<&Self>) -> Option<ReentrantMutexGuard<'_, T>> {
         let this_thread = current_thread_unique_ptr();
         // Safety: We only touch lock_count when we own the lock,

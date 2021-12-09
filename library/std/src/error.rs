@@ -21,7 +21,7 @@ use core::convert::Infallible;
 
 use crate::alloc::{AllocError, LayoutError};
 use crate::any::TypeId;
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 use crate::backtrace::Backtrace;
 use crate::borrow::Cow;
 use crate::cell;
@@ -135,7 +135,7 @@ pub trait Error: Debug + Display {
     /// `Backtrace` may actually be empty. For more information consult the
     /// `Backtrace` type itself.
     #[unstable(feature = "backtrace", issue = "53487")]
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     fn backtrace(&self) -> Option<&Backtrace> {
         None
     }
@@ -544,7 +544,7 @@ impl<'a, T: Error + ?Sized> Error for &'a T {
         Error::source(&**self)
     }
 
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     fn backtrace(&self) -> Option<&Backtrace> {
         Error::backtrace(&**self)
     }
@@ -566,7 +566,7 @@ impl<T: Error + ?Sized> Error for Arc<T> {
         Error::source(&**self)
     }
 
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     fn backtrace(&self) -> Option<&Backtrace> {
         Error::backtrace(&**self)
     }
