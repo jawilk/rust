@@ -1175,6 +1175,7 @@ symbols! {
         sanitizer_runtime,
         saturating_add,
         saturating_sub,
+        sbf_target_feature,
         self_in_typedefs,
         self_struct_ctor,
         semitransparent,

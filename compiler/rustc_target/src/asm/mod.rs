@@ -217,8 +217,9 @@ impl FromStr for InlineAsmArch {
             "spirv" => Ok(Self::SpirV),
             "wasm32" => Ok(Self::Wasm32),
             "wasm64" => Ok(Self::Wasm64),
-            "bpf" => Ok(Self::Bpf),
             "avr" => Ok(Self::Avr),
+            "bpf" => Ok(Self::Bpf),
+            "sbf" => Ok(Self::Bpf),
             _ => Err(()),
         }
     }

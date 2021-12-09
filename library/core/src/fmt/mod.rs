@@ -4,7 +4,7 @@
 
 use crate::cell::{Cell, Ref, RefCell, RefMut, UnsafeCell};
 use crate::char::EscapeDebugExtArgs;
-#[cfg(target_arch = "bpf")]
+#[cfg(any(target_arch = "bpf", target_arch = "sbf"))]
 use crate::intrinsics::abort;
 use crate::marker::PhantomData;
 use crate::mem;
@@ -307,11 +307,11 @@ impl UnsafeArg {
 static USIZE_MARKER: fn(&usize, &mut Formatter<'_>) -> Result = |ptr, _| {
     // SAFETY: ptr is a reference
     let _v: usize = unsafe { crate::ptr::read_volatile(ptr) };
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     {
         loop {}
     }
-    #[cfg(target_arch = "bpf")]
+    #[cfg(any(target_arch = "bpf", target_arch = "sbf"))]
     {
         abort()
     }

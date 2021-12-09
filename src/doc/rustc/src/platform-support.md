@@ -271,6 +271,7 @@ target | std | host | notes
 `riscv64gc-unknown-freebsd` |   |   | RISC-V FreeBSD
 `riscv64gc-unknown-linux-musl` |   |   | RISC-V Linux (kernel 4.20, musl 1.2.0)
 `s390x-unknown-linux-musl` |  |  | S390x Linux (kernel 2.6.32, MUSL)
+`sbf-solana-solana` | ✓ |  | SBF
 `sparc-unknown-linux-gnu` | ✓ |  | 32-bit SPARC Linux
 `sparc64-unknown-netbsd` | ✓ | ✓ | NetBSD/sparc64
 `sparc64-unknown-openbsd` | ? |  |

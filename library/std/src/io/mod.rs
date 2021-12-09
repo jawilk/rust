@@ -280,7 +280,7 @@ pub use self::stdio::set_output_capture;
 pub use self::stdio::{Stderr, Stdin, Stdout};
 #[stable(feature = "rust1", since = "1.0.0")]
 pub use self::stdio::{stdin, stdout, stderr};
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 #[unstable(feature = "stdio_locked", issue = "86845")]
 pub use self::stdio::{stderr_locked, stdin_locked, stdout_locked};
 #[stable(feature = "rust1", since = "1.0.0")]

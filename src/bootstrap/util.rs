@@ -266,7 +266,8 @@ pub fn use_host_linker(target: TargetSelection) -> bool {
         || target.contains("nvptx")
         || target.contains("fortanix")
         || target.contains("fuchsia")
-        || target.contains("bpf"))
+        || target.contains("bpf")
+        || target.contains("sbf"))
 }
 
 pub fn is_valid_test_suite_arg<'a, P: AsRef<Path>>(

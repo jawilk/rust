@@ -1,6 +1,6 @@
 //! Module converting command-line arguments into test configuration.
 
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 use std::env;
 use std::path::PathBuf;
 
@@ -43,7 +43,7 @@ impl TestOpts {
 /// Result of parsing the options.
 pub type OptRes = Result<TestOpts, String>;
 /// Result of parsing the option part.
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 type OptPartRes<T> = Result<T, String>;
 
 fn optgroups() -> getopts::Options {
@@ -221,7 +221,7 @@ pub fn parse_opts(args: &[String]) -> Option<OptRes> {
 }
 
 // Gets the option value and checks if unstable features are enabled.
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 macro_rules! unstable_optflag {
     ($matches:ident, $allow_unstable:ident, $option_name:literal) => {{
         let opt = $matches.opt_present($option_name);
@@ -253,7 +253,7 @@ macro_rules! unstable_optopt {
 
 // Implementation of `parse_opts` that doesn't care about help message
 // and returns a `Result`.
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 fn parse_opts_impl(matches: getopts::Matches) -> OptRes {
     let allow_unstable = get_allow_unstable(&matches)?;
 
@@ -307,7 +307,7 @@ fn parse_opts_impl(matches: getopts::Matches) -> OptRes {
     Ok(test_opts)
 }
 
-#[cfg(target_arch = "bpf")]
+#[cfg(any(target_arch = "bpf", target_arch = "sbf"))]
 fn parse_opts_impl(_matches: getopts::Matches) -> OptRes {
     let test_opts = TestOpts {
         list: false,
@@ -332,7 +332,7 @@ fn parse_opts_impl(_matches: getopts::Matches) -> OptRes {
 }
 
 // FIXME: Copied from librustc_ast until linkage errors are resolved. Issue #47566
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 fn is_nightly() -> bool {
     // Whether this is a feature-staged build, i.e., on the beta or stable channel
     let disable_unstable_features = option_env!("CFG_DISABLE_UNSTABLE_FEATURES").is_some();
@@ -343,7 +343,7 @@ fn is_nightly() -> bool {
 }
 
 // Gets the CLI options associated with `report-time` feature.
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 fn get_time_options(
     matches: &getopts::Matches,
     allow_unstable: bool,
@@ -407,7 +407,7 @@ fn get_shuffle_seed(matches: &getopts::Matches, allow_unstable: bool) -> OptPart
     Ok(shuffle_seed)
 }
 
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 fn get_test_threads(matches: &getopts::Matches) -> OptPartRes<Option<usize>> {
     let test_threads = match matches.opt_str("test-threads") {
         Some(n_str) => match n_str.parse::<usize>() {
@@ -427,7 +427,7 @@ fn get_test_threads(matches: &getopts::Matches) -> OptPartRes<Option<usize>> {
     Ok(test_threads)
 }
 
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 fn get_format(
     matches: &getopts::Matches,
     quiet: bool,
@@ -461,7 +461,7 @@ fn get_format(
     Ok(format)
 }
 
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 fn get_color_config(matches: &getopts::Matches) -> OptPartRes<ColorConfig> {
     let color = match matches.opt_str("color").as_deref() {
         Some("auto") | None => ColorConfig::AutoColor,
@@ -480,7 +480,7 @@ fn get_color_config(matches: &getopts::Matches) -> OptPartRes<ColorConfig> {
     Ok(color)
 }
 
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 fn get_nocapture(matches: &getopts::Matches) -> OptPartRes<bool> {
     let mut nocapture = matches.opt_present("nocapture");
     if !nocapture {
@@ -493,7 +493,7 @@ fn get_nocapture(matches: &getopts::Matches) -> OptPartRes<bool> {
     Ok(nocapture)
 }
 
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 fn get_run_ignored(matches: &getopts::Matches, include_ignored: bool) -> OptPartRes<RunIgnored> {
     let run_ignored = match (include_ignored, matches.opt_present("ignored")) {
         (true, true) => {
@@ -507,7 +507,7 @@ fn get_run_ignored(matches: &getopts::Matches, include_ignored: bool) -> OptPart
     Ok(run_ignored)
 }
 
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 fn get_allow_unstable(matches: &getopts::Matches) -> OptPartRes<bool> {
     let mut allow_unstable = false;
 
@@ -529,7 +529,7 @@ fn get_allow_unstable(matches: &getopts::Matches) -> OptPartRes<bool> {
     Ok(allow_unstable)
 }
 
-#[cfg(not(target_arch = "bpf"))]
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 fn get_log_file(matches: &getopts::Matches) -> OptPartRes<Option<PathBuf>> {
     let logfile = matches.opt_str("logfile").map(|s| PathBuf::from(&s));
 

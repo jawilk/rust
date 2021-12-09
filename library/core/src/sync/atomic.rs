@@ -2343,8 +2343,9 @@ fn strongest_failure_ordering(order: Ordering) -> Ordering {
 
 #[inline]
 #[cfg_attr(target_arch = "bpf", allow(unused_variables))]
+#[cfg_attr(target_arch = "sbf", allow(unused_variables))]
 unsafe fn atomic_store<T: Copy>(dst: *mut T, val: T, order: Ordering) {
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     // SAFETY: the caller must uphold the safety contract for `atomic_store`.
     unsafe {
         match order {
@@ -2355,7 +2356,7 @@ unsafe fn atomic_store<T: Copy>(dst: *mut T, val: T, order: Ordering) {
             AcqRel => panic!("there is no such thing as an acquire/release store"),
         }
     }
-    #[cfg(target_arch = "bpf")]
+    #[cfg(any(target_arch = "bpf", target_arch = "sbf"))]
     // SAFETY: the caller must uphold the safety contract for `atomic_store`.
     unsafe {
         *dst = val;
@@ -2364,8 +2365,9 @@ unsafe fn atomic_store<T: Copy>(dst: *mut T, val: T, order: Ordering) {
 
 #[inline]
 #[cfg_attr(target_arch = "bpf", allow(unused_variables))]
+#[cfg_attr(target_arch = "sbf", allow(unused_variables))]
 unsafe fn atomic_load<T: Copy>(dst: *const T, order: Ordering) -> T {
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     // SAFETY: the caller must uphold the safety contract for `atomic_load`.
     unsafe {
         match order {
@@ -2376,7 +2378,7 @@ unsafe fn atomic_load<T: Copy>(dst: *const T, order: Ordering) -> T {
             AcqRel => panic!("there is no such thing as an acquire/release load"),
         }
     }
-    #[cfg(target_arch = "bpf")]
+    #[cfg(any(target_arch = "bpf", target_arch = "sbf"))]
     // SAFETY: the caller must uphold the safety contract for `atomic_load`.
     unsafe {
         *dst
@@ -2386,8 +2388,9 @@ unsafe fn atomic_load<T: Copy>(dst: *const T, order: Ordering) -> T {
 #[inline]
 #[cfg(target_has_atomic = "8")]
 #[cfg_attr(target_arch = "bpf", allow(unused_variables))]
+#[cfg_attr(target_arch = "sbf", allow(unused_variables))]
 unsafe fn atomic_swap<T: Copy>(dst: *mut T, val: T, order: Ordering) -> T {
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     // SAFETY: the caller must uphold the safety contract for `atomic_swap`.
     unsafe {
         match order {
@@ -2398,7 +2401,7 @@ unsafe fn atomic_swap<T: Copy>(dst: *mut T, val: T, order: Ordering) -> T {
             SeqCst => intrinsics::atomic_xchg(dst, val),
         }
     }
-    #[cfg(target_arch = "bpf")]
+    #[cfg(any(target_arch = "bpf" ,target_arch = "sbf"))]
     // SAFETY: the caller must uphold the safety contract for `atomic_swap`.
     unsafe {
         let old = *dst;
@@ -2411,8 +2414,9 @@ unsafe fn atomic_swap<T: Copy>(dst: *mut T, val: T, order: Ordering) -> T {
 #[inline]
 #[cfg(target_has_atomic = "8")]
 #[cfg_attr(target_arch = "bpf", allow(unused_variables))]
+#[cfg_attr(target_arch = "sbf", allow(unused_variables))]
 unsafe fn atomic_add<T: Copy + crate::ops::Add<Output = T>>(dst: *mut T, val: T, order: Ordering) -> T {
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     // SAFETY: the caller must uphold the safety contract for `atomic_add`.
     unsafe {
         match order {
@@ -2423,7 +2427,7 @@ unsafe fn atomic_add<T: Copy + crate::ops::Add<Output = T>>(dst: *mut T, val: T,
             SeqCst => intrinsics::atomic_xadd(dst, val),
         }
     }
-    #[cfg(target_arch = "bpf")]
+    #[cfg(any(target_arch = "bpf", target_arch = "sbf"))]
     // SAFETY: the caller must uphold the safety contract for `atomic_add`.
     unsafe {
         let old = *dst;
@@ -2436,8 +2440,9 @@ unsafe fn atomic_add<T: Copy + crate::ops::Add<Output = T>>(dst: *mut T, val: T,
 #[inline]
 #[cfg(target_has_atomic = "8")]
 #[cfg_attr(target_arch = "bpf", allow(unused_variables))]
+#[cfg_attr(target_arch = "sbf", allow(unused_variables))]
 unsafe fn atomic_sub<T: Copy + crate::ops::Sub<Output = T>>(dst: *mut T, val: T, order: Ordering) -> T {
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     // SAFETY: the caller must uphold the safety contract for `atomic_sub`.
     unsafe {
         match order {
@@ -2448,7 +2453,7 @@ unsafe fn atomic_sub<T: Copy + crate::ops::Sub<Output = T>>(dst: *mut T, val: T,
             SeqCst => intrinsics::atomic_xsub(dst, val),
         }
     }
-    #[cfg(target_arch = "bpf")]
+    #[cfg(any(target_arch = "bpf", target_arch = "sbf"))]
     // SAFETY: the caller must uphold the safety contract for `atomic_sub`.
     unsafe {
         let old = *dst;
@@ -2460,6 +2465,7 @@ unsafe fn atomic_sub<T: Copy + crate::ops::Sub<Output = T>>(dst: *mut T, val: T,
 #[inline]
 #[cfg(target_has_atomic = "8")]
 #[cfg_attr(target_arch = "bpf", allow(unused_variables))]
+#[cfg_attr(target_arch = "sbf", allow(unused_variables))]
 unsafe fn atomic_compare_exchange<T: Copy + crate::cmp::PartialEq>(
     dst: *mut T,
     old: T,
@@ -2467,7 +2473,7 @@ unsafe fn atomic_compare_exchange<T: Copy + crate::cmp::PartialEq>(
     success: Ordering,
     failure: Ordering,
 ) -> Result<T, T> {
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     {
         // SAFETY: the caller must uphold the safety contract for `atomic_compare_exchange`.
         let (val, ok) = unsafe {
@@ -2488,7 +2494,7 @@ unsafe fn atomic_compare_exchange<T: Copy + crate::cmp::PartialEq>(
         };
         if ok { Ok(val) } else { Err(val) }
     }
-    #[cfg(target_arch = "bpf")]
+    #[cfg(any(target_arch = "bpf", target_arch = "sbf"))]
     // SAFETY: the caller must uphold the safety contract for `atomic_compare_exchange`.
     unsafe {
         let current = *dst;
@@ -2510,7 +2516,7 @@ unsafe fn atomic_compare_exchange_weak<T: Copy + crate::cmp::PartialEq>(
     _success: Ordering,
     _failure: Ordering,
 ) -> Result<T, T> {
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     {
         // SAFETY: the caller must uphold the safety contract for `atomic_compare_exchange_weak`.
         let (val, ok) = unsafe {
@@ -2531,7 +2537,7 @@ unsafe fn atomic_compare_exchange_weak<T: Copy + crate::cmp::PartialEq>(
         };
         if ok { Ok(val) } else { Err(val) }
     }
-    #[cfg(target_arch = "bpf")]
+    #[cfg(any(target_arch = "sbf", target_arch = "bpf"))]
     // SAFETY: the caller must uphold the safety contract for `atomic_compare_exchange_weak`.
     unsafe {
         let current = *dst;
@@ -2608,7 +2614,7 @@ unsafe fn atomic_xor<T: Copy>(dst: *mut T, val: T, order: Ordering) -> T {
 #[inline]
 #[cfg(target_has_atomic = "8")]
 unsafe fn atomic_max<T: Copy + crate::cmp::Ord>(dst: *mut T, val: T, _order: Ordering) -> T {
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     // SAFETY: the caller must uphold the safety contract for `atomic_max`
     unsafe {
         match _order {
@@ -2619,7 +2625,7 @@ unsafe fn atomic_max<T: Copy + crate::cmp::Ord>(dst: *mut T, val: T, _order: Ord
             SeqCst => intrinsics::atomic_max(dst, val),
         }
     }
-    #[cfg(target_arch = "bpf")]
+    #[cfg(any(target_arch = "bpf", target_arch = "sbf"))]
     // SAFETY: the caller must uphold the safety contract for `atomic_max`
     unsafe {
         crate::cmp::max(*dst, val)
@@ -2630,7 +2636,7 @@ unsafe fn atomic_max<T: Copy + crate::cmp::Ord>(dst: *mut T, val: T, _order: Ord
 #[inline]
 #[cfg(target_has_atomic = "8")]
 unsafe fn atomic_min<T: Copy + crate::cmp::Ord>(dst: *mut T, val: T, _order: Ordering) -> T {
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     // SAFETY: the caller must uphold the safety contract for `atomic_min`
     unsafe {
         match _order {
@@ -2641,7 +2647,7 @@ unsafe fn atomic_min<T: Copy + crate::cmp::Ord>(dst: *mut T, val: T, _order: Ord
             SeqCst => intrinsics::atomic_min(dst, val),
         }
     }
-    #[cfg(target_arch = "bpf")]
+    #[cfg(any(target_arch = "bpf", target_arch = "sbf"))]
     // SAFETY: the caller must uphold the safety contract for `atomic_min`
     unsafe {
         crate::cmp::min(*dst, val)
@@ -2652,7 +2658,7 @@ unsafe fn atomic_min<T: Copy + crate::cmp::Ord>(dst: *mut T, val: T, _order: Ord
 #[inline]
 #[cfg(target_has_atomic = "8")]
 unsafe fn atomic_umax<T: Copy + crate::cmp::Ord>(dst: *mut T, val: T, _order: Ordering) -> T {
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     // SAFETY: the caller must uphold the safety contract for `atomic_umax`
     unsafe {
         match _order {
@@ -2663,7 +2669,7 @@ unsafe fn atomic_umax<T: Copy + crate::cmp::Ord>(dst: *mut T, val: T, _order: Or
             SeqCst => intrinsics::atomic_umax(dst, val),
         }
     }
-    #[cfg(target_arch = "bpf")]
+    #[cfg(any(target_arch = "bpf", target_arch = "sbf"))]
     // SAFETY: the caller must uphold the safety contract for `atomic_umax`
     unsafe {
         crate::cmp::max(*dst, val)
@@ -2674,7 +2680,7 @@ unsafe fn atomic_umax<T: Copy + crate::cmp::Ord>(dst: *mut T, val: T, _order: Or
 #[inline]
 #[cfg(target_has_atomic = "8")]
 unsafe fn atomic_umin<T: Copy + crate::cmp::Ord>(dst: *mut T, val: T, _order: Ordering) -> T {
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     // SAFETY: the caller must uphold the safety contract for `atomic_umin`
     unsafe {
         match _order {
@@ -2685,7 +2691,7 @@ unsafe fn atomic_umin<T: Copy + crate::cmp::Ord>(dst: *mut T, val: T, _order: Or
             SeqCst => intrinsics::atomic_umin(dst, val),
         }
     }
-    #[cfg(target_arch = "bpf")]
+    #[cfg(any(target_arch = "bpf", target_arch = "sbf"))]
     // SAFETY: the caller must uphold the safety contract for `atomic_umin`
     unsafe {
         crate::cmp::min(*dst, val)
@@ -2769,11 +2775,11 @@ unsafe fn atomic_umin<T: Copy + crate::cmp::Ord>(dst: *mut T, val: T, _order: Or
 #[inline]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[rustc_diagnostic_item = "fence"]
-#[cfg_attr(any(target_arch = "bpf", target_arch = "wasm32"), allow(unused_variables))]
+#[cfg_attr(any(target_arch = "bpf", target_arch = "sbf", target_arch = "wasm32"), allow(unused_variables))]
 pub fn fence(order: Ordering) {
-    #[cfg(not(any(target_arch = "wasm32", target_arch = "bpf")))]
+    #[cfg(not(any(target_arch = "wasm32", target_arch = "bpf", target_arch = "sbf")))]
     // SAFETY: using an atomic fence is safe.
-    // On wasm32 and BPF it looks like fences aren't implemented in LLVM yet in that
+    // On wasm32 and SBF it looks like fences aren't implemented in LLVM yet in that
     // they will cause LLVM to abort. The wasm instruction set doesn't have
     // fences right now. There's discussion online about the best way for tools
     // to conventionally implement fences at
@@ -2860,8 +2866,9 @@ pub fn fence(order: Ordering) {
 #[stable(feature = "compiler_fences", since = "1.21.0")]
 #[rustc_diagnostic_item = "compiler_fence"]
 #[cfg_attr(target_arch = "bpf", allow(unused_variables))]
+#[cfg_attr(target_arch = "sbf", allow(unused_variables))]
 pub fn compiler_fence(order: Ordering) {
-    #[cfg(not(target_arch = "bpf"))]
+    #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
     // SAFETY: using an atomic fence is safe.
     unsafe {
         match order {
