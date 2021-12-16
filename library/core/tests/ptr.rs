@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 use core::cell::RefCell;
 use core::num::NonZeroUsize;
 use core::ptr;
@@ -309,6 +310,8 @@ pub fn test_variadic_fnptr() {
     assert_eq!(p.hash(&mut s), q.hash(&mut s));
 }
 
+// sbf doesn't support thread locals
+#[cfg(not(any(target_arch = "bpf", target_arch = "sbf")))]
 #[test]
 fn write_unaligned_drop() {
     thread_local! {
