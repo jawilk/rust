@@ -10,7 +10,7 @@ use crate::cell::{Cell, RefCell};
 use crate::fmt;
 #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 use crate::io::{self, BufReader, IoSlice, IoSliceMut, LineWriter, Lines, Split};
-#[cfg(target_arch = "bpf")]
+#[cfg(any(target_arch = "bpf", target_arch = "sbf"))]
 use crate::io::{self, BufReader, IoSlice, IoSliceMut};
 #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 use crate::lazy::SyncOnceCell;
@@ -562,10 +562,6 @@ impl Read for Stdin {
     #[inline]
     fn is_read_vectored(&self) -> bool {
         false
-    }
-    #[inline]
-    unsafe fn initializer(&self) -> Initializer {
-        Initializer::nop()
     }
     fn read_to_end(&mut self, _buf: &mut Vec<u8>) -> io::Result<usize> {
         Ok(0)

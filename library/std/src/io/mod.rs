@@ -277,9 +277,7 @@ pub use self::error::{Error, ErrorKind, Result};
 #[doc(no_inline, hidden)]
 pub use self::stdio::set_output_capture;
 #[stable(feature = "rust1", since = "1.0.0")]
-pub use self::stdio::{Stderr, Stdin, Stdout};
-#[stable(feature = "rust1", since = "1.0.0")]
-pub use self::stdio::{stdin, stdout, stderr};
+pub use self::stdio::{stderr, stdin, stdout, Stderr, Stdin, Stdout};
 #[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 #[unstable(feature = "stdio_locked", issue = "86845")]
 pub use self::stdio::{stderr_locked, stdin_locked, stdout_locked};
@@ -305,6 +303,7 @@ mod util;
 
 const DEFAULT_BUF_SIZE: usize = crate::sys_common::io::DEFAULT_BUF_SIZE;
 
+#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
 pub(crate) use stdio::cleanup;
 
 struct Guard<'a> {
