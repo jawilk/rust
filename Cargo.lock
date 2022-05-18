@@ -748,9 +748,8 @@ dependencies = [
 
 [[package]]
 name = "compiler_builtins"
-version = "0.1.71"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "163437f05ca8f29d7e9128ea728dedf5eb620e445fbca273641d3a3050305f23"
+version = "0.1.72"
+source = "git+https://github.com/solana-labs/compiler-builtins?tag=bpf-tools-v1.27#9dea8f0910b8899dbaa6f89343dcdffc9f9dca0a"
 dependencies = [
  "cc",
  "rustc-std-workspace-core",
@@ -5855,8 +5854,3 @@ checksum = "fe5c30ade05e61656247b2e334a031dfd0cc466fadef865bdcdea8d537951bf1"
 dependencies = [
  "winapi",
 ]
-
-[[patch.unused]]
-name = "compiler_builtins"
-version = "0.1.76"
-source = "git+https://github.com/solana-labs/compiler-builtins#2044d7e16a99d951853ce362e384027dec4c5b92"
