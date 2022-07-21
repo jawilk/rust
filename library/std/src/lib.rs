@@ -363,7 +363,7 @@ extern crate unwind;
 
 #[doc(masked)]
 #[allow(unused_extern_crates)]
-#[cfg(feature = "miniz_oxide")]
+#[cfg(all(not(any(target_arch = "bpf", target_arch = "sbf")), feature = "miniz_oxide"))]
 extern crate miniz_oxide;
 
 // During testing, this crate is not actually the "real" std library, but rather
@@ -575,7 +575,7 @@ pub mod alloc;
 // Private support modules
 mod panicking;
 
-#[cfg(all(not(target_arch = "bpf"), not(target_arch = "sbf")))]
+#[cfg(not(any(target_arch = "bpf", target_arch = "sbf")))]
 #[path = "../../backtrace/src/lib.rs"]
 #[allow(dead_code, unused_attributes)]
 mod backtrace_rs;
